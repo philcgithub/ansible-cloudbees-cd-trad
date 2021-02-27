@@ -1,0 +1,1 @@
+# ansible-cloudbees-cd-trad
