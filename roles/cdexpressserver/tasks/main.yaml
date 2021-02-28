@@ -1,0 +1,17 @@
+# This role will install CloudBees CD express server
+
+# Setup the env
+- name: Setup the env
+  include: setup_env.yaml
+
+# Install CloudBees CD express server
+- name: Install CD Express Server
+  include: install_cd_express.yaml
+
+# Install Analytics
+- name: Install Analytics
+  include: install_analytics.yaml
+
+# Obtain and install letsencrypt certs
+- name: Obtain and install letsencrypt certs
+  include: letsencrypt_certs.yaml

@@ -1,0 +1,14 @@
+# Check server installation is complete
+- name: Wait for installation to complete
+  wait_for:
+    path: "{{ install_dir }}/logs/setupScripts.log"
+    search_regex: "Finished loading"
+    delay: 10
+    timeout: 900 #15 mins
+    msg: "CloudBees CD installation failed"
+
+# Run the installer
+- name: Install Analytics  server
+  command: '{{ installer_path }}/{{ analytics_installer_file }} --mode silent --elasticsearchUserPassword {{ elasticsearch_password }} --remoteServer {{ analytics_remoteserver }} --unixServerUser {{ installer_user }} --unixServerGroup {{ installer_user }} --remoteServerPassword {{ admin_password }} --remoteServerUser {{ analytics_remoteserver_user }}'
+  become: yes
+  

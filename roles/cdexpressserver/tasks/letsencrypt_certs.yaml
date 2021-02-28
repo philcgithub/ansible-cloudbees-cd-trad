@@ -1,0 +1,103 @@
+# Backup server.crt
+- name: Backup server.crt
+  copy:
+    src: "{{ install_dir }}/apache/conf/server.crt"
+    remote_src: yes
+    dest: "{{ install_dir }}/server-backup.crt"
+  become: yes
+
+# Backup server.key
+- name: Backup server.crt
+  copy:
+    src: "{{ install_dir }}/apache/conf/server.key"
+    remote_src: yes
+    dest: "{{ install_dir }}/server-backup.key"
+  become: yes
+
+# Install software-properties-common
+- name: Install software-properties-common
+  apt: name=software-properties-common state=present update_cache=yes
+  become: yes
+
+# Add universe repository
+- name: Add universe repository
+  command: add-apt-repository universe
+  become: yes
+
+# Add ppa:certbot/certbod repository
+- name: Add ppa:certbot/cerbot repository
+  apt_repository:
+    repo: 'ppa:certbot/certbot'
+    state: present
+  become: yes
+
+# Install Certbot
+- name: Install Certbot
+  apt: name=certbot state=present update_cache=yes
+  become: yes
+
+## Get the certificate for the 1st time
+- name: Stop the CD server
+  command: /etc/init.d/commanderApache stop
+  become: yes
+
+- name: Pause for manual run of certbot command
+  pause:
+
+# Generate the certificate using Certbot
+- name: Generate certs
+  command: certbot certonly --standalone --quiet --non-interactive --agree-tos \
+  -d "{{ domain }}" -m pcherry@cloudbees.com
+  become: yes
+
+# Stop the apache server
+- name: Stop the CD server
+  command: /etc/init.d/commanderApache stop
+  become: yes
+
+# Set ServerName in apache ssl conf
+- name: Set ServerName in apache ssl.conf
+  lineinfile:
+    path: "{{ install_dir }}/apache/conf/ssl.conf"
+    regexp: '^ServerName.*$'
+    line: 'ServerName {{ domain }}'
+  become: yes
+
+## Automatic certificate renewals
+### Create a 'copy certificates' script
+- name: Create renew_certificates.sh script
+  template:
+    src: 'renew_certificates.sh'
+    dest: "{{ install_dir }}/apache/conf/renew_certificates.sh"
+    owner: "{{ installer_user }}"
+    group: "{{ installer_user }}"
+    mode: 0755
+    force: yes
+  become: yes
+
+### Edit Certbot configuration to use this script
+# Set letsencrypt pre_hook
+- name: Set letsencrypt pre_hook
+  lineinfile:
+    path: "/etc/letsencrypt/renewal/{{ domain }}.conf"
+    regexp: '^pre_hook.*$'
+    line: 'pre_hook = sudo /etc/init.d/commanderApache stop; sleep 5'
+  become: yes
+
+# Set letsencrypt post_hook
+- name: Set letsencrypt post_hook
+  lineinfile:
+    path: "/etc/letsencrypt/renewal/{{ domain }}.conf"
+    regexp: '^post_hook.*$'
+    line: 'post_hook = {{ install_dir }}/apache/conf/renew_certificates.sh; sudo /etc/init.d/commanderApache start'
+  become: yes
+
+## Test the renewal - this also copies certs into the right location
+- name: certbot renew --dry-run
+  command: certbot renew --dry-run
+  become: yes
+
+# Start the server
+- name: Start the CD server
+  command: /etc/init.d/commanderApache start
+  become: yes

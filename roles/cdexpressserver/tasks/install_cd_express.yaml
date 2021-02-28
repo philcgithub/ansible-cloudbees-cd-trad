@@ -1,0 +1,21 @@
+# Run the installer
+- name: Install CD express server
+  command: '{{ installer_path }}/{{ server_installer_file }} --mode silent --installServer --installWeb --installAgent --installRepository --unixServerUser {{ installer_user }} --unixServerGroup {{ installer_user }} --useSameServiceAccount --installDatabase --databasePassword {{ db_password }}'
+  become: yes
+
+# Wait for installation to complete
+- name: Wait for installation to complete
+  wait_for :
+    path: "{{ install_dir }}/logs/setupScripts.log"
+    search_regex: "Finished loading"
+    #delay: 300
+    sleep: 10
+    timeout: 900 #15 mins
+    msg: "CloudBees CD installation failed"
+
+# Change admin password using ectool
+- name: Set admin password
+  shell: |
+      {{ install_dir }}/bin/ectool --server localhost login "admin" "changeme"
+      {{ install_dir }}/bin/ectool modifyUser "admin" --password "{{ admin_password }}" --sessionPassword "changeme"
+      exit 0

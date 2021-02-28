@@ -1,0 +1,7 @@
+- name: Handle certs
+  hosts: cdexpressserver
+  tasks:
+  - name: Run certs playbook only
+    include_role:
+      name: cdexpressserver
+      tasks_from: letsencrypt_certs

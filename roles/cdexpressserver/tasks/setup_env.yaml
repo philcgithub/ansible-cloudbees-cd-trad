@@ -1,0 +1,18 @@
+# Create user
+- name: Create OS user
+  user:
+    name: "{{ installer_user }}"
+    shell: /bin/bash
+    password: "{{ installer_password }}"
+  become: yes
+
+  # Allow this user to run installer as sudo without password
+- name: Allow this user to run installer as sudo without password
+  lineinfile:
+    path: /etc/sudoers.d/{{ installer_user }}
+    line: '{{ installer_user }} ALL=(ALL) NOPASSWD: {{ installer_path }}/{{ server_installer_file }} '
+    state: present
+    mode: 0440
+    create: yes
+    validate: 'visudo -cf %s'
+  become: yes
