@@ -1,2 +1,8 @@
 # Mac files
 .DS_Store
+
+# ## CloudBees CD license file
+license.xml
+
+# ## mysql connector jar file
+mysql-connector-java*.jar
