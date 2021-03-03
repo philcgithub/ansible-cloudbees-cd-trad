@@ -1,0 +1,15 @@
+- name: Install CloudBees CD Server with external MySQL Database
+  hosts: cdserver
+  tasks:
+  - name: Setup Environment
+    include_role:
+      name: cdserver
+      tasks_from: setup_env
+  - name: Install CD server with external mysql
+    include_role:
+      name: cdserver
+      tasks_from: install_cd_ext_db
+  - name: Install Analytics
+    include_role:
+      name: cdserver
+      tasks_from: install_analytics

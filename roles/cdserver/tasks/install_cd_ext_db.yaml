@@ -1,0 +1,71 @@
+# Run the installer
+- name: Install CD server
+  command: '{{ installer_path }}/{{ server_installer_file }} --mode silent --installServer --installWeb --installAgent --installRepository --unixServerUser {{ installer_user }} --unixServerGroup {{ installer_user }} --useSameServiceAccount'
+  become: yes
+
+# Copy myql connector java in to the right location
+- name: Copy myql connector java
+  copy:
+    src: "../files/{{ mysql_jar }}"
+    dest: "{{ install_dir }}/server/lib/mysql-connector-java.jar"
+    owner: "{{ installer_user }}"
+    group: "{{ installer_user }}"
+  become: yes
+
+# Restart the CloudBees CD Server
+- name: Restart CloudBees CD Server
+  command: '/etc/init.d/commanderServer restart'
+  become: yes
+
+# Wait for server to be ready for database configuration
+- name: Wait for server to be ready for database configuration
+  wait_for:
+    path: "{{ install_dir }}/logs/commander.log"
+    search_regex: "Waiting until a valid database configuration has been supplied"
+    sleep: 10
+    timeout: 900 # 15 mins
+    msg: CloudBees CD Server startup failed
+
+# Set database configuration
+- name: Set database configuration
+  command: "{{ install_dir }}/bin/ectool setDatabaseConfiguration --databaseType mysql --databaseName {{ db_name }} --hostName {{ db_host }} --port {{ db_port }} --userName {{ db_username }} --password {{ db_password }}"
+
+# Wait for setup to finish
+- name: Wait for setup to finish
+  wait_for :
+    path: "{{ install_dir }}/logs/setupScripts.log"
+    search_regex: "Finished loading"
+    sleep: 10
+    timeout: 900 #15 mins
+    msg: "CloudBees CD installation failed"
+
+# Change admin password using ectool
+- name: Set admin password
+  shell: |
+      {{ install_dir }}/bin/ectool --server localhost login "admin" "changeme"
+      {{ install_dir }}/bin/ectool modifyUser "admin" --password "{{ admin_password }}" --sessionPassword "changeme"
+
+# Check if license file has been supplied
+- name: Check if license file has been supplied
+  local_action: stat path="{{ role_path }}/files/license.xml"
+  register: file
+
+# Copy license file if supplied
+- name: Copy license.xml
+  copy:
+    src: "../files/license.xml"
+    dest: "/tmp/license.xml"
+  when: file.stat.exists
+
+# Apply license
+- name: Apply license
+  shell: |
+    {{ install_dir }}/bin/ectool --server localhost login "admin" "{{ admin_password }}"
+    {{ install_dir }}/bin/ectool importLicenseData /tmp/license.xml
+  when: file.stat.exists
+
+# Remove license file if it was copied over
+- name: Remove license file
+  file:
+    path: "/tmp/license.xml"
+    state: absent
