@@ -1,4 +1,4 @@
 - name: Install CloudBees CD Express Server
-  hosts: cdexpressserver
+  hosts: cdserver
   roles:
-  - cdexpressserver
+  - cdserver

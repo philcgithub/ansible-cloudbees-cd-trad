@@ -1,20 +1,20 @@
 - name: Upgrade CloudBees CD Express Server
-  hosts: cdexpressserver
+  hosts: cdserver
   tasks:
 # Setup env (mostly to make sure user can run the new installers as sudo)
   - name: Setup env
     include_role:
-      name: cdexpressserver
+      name: cdserver
       tasks_from: setup_env
 
 # Upgrsade CloudBees CD express server
   - name: Upgrade CloudBees CD express server
     include_role:
-      name: cdexpressserver
+      name: cdserver
       tasks_from: install_cd_express
 
 # Upgrade Analytics
   - name: Upgrade Analytics
     include_role:
-      name: cdexpressserver
+      name: cdserver
       tasks_from: install_analytics

@@ -19,7 +19,7 @@ The upgrade playbook has not been tested and will most likely need some changes.
 
 There is currently a single role defined:
 
-- cdexpressserver
+- cdserver
 
 And this role contains several playbooks:
 
@@ -33,13 +33,13 @@ And this role contains several playbooks:
 
 ### 1. Set the variables ###
 
-Set the variables in the cdexpressserver role (vars/main.yaml) as appropriate.
+Set the variables in the cdserver role (vars/main.yaml) as appropriate.
 ### 2. Prepare the inventory file ###
 
 The playbooks assume you already have a single vm ready to install CloudBees CD Express Server on to.  Modify the line in the inventory.txt file to match your vm instance:
 
 ```ini
-cdexpressserver ansible_host=12.345.678.901 ansible_connection=ssh ansible_user=phil ansible_ssh_private_key_file="~/id_rsa"
+cdserver ansible_host=12.345.678.901 ansible_connection=ssh ansible_user=phil ansible_ssh_private_key_file="~/id_rsa"
 ```
 
 ### 3. Prepare the environment ###

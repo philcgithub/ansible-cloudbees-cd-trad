@@ -8,7 +8,6 @@
     msg: "CloudBees CD installation failed"
 
 # Run the installer
-- name: Install Analytics  server
+- name: Install Analytics server
   command: '{{ installer_path }}/{{ analytics_installer_file }} --mode silent --elasticsearchUserPassword {{ elasticsearch_password }} --remoteServer {{ analytics_remoteserver }} --unixServerUser {{ installer_user }} --unixServerGroup {{ installer_user }} --remoteServerPassword {{ admin_password }} --remoteServerUser {{ analytics_remoteserver_user }}'
   become: yes
-  
