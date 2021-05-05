@@ -41,13 +41,9 @@
   command: /etc/init.d/commanderApache stop
   become: yes
 
-- name: Pause for manual run of certbot command
-  pause:
-
 # Generate the certificate using Certbot
 - name: Generate certs
-  command: certbot certonly --standalone --quiet --non-interactive --agree-tos \
-  -d "{{ domain }}" -m pcherry@cloudbees.com
+  command: certbot certonly --standalone --quiet --non-interactive --agree-tos -d "{{ domain }}" -m pcherry@cloudbees.com
   become: yes
 
 # Stop the apache server
