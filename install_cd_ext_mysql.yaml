@@ -1,5 +1,7 @@
 - name: Install CloudBees CD Server with external MySQL Database
   hosts: cdserver
+  vars_files:
+    - "{{ files_yaml }}"
   tasks:
   - name: Setup Environment
     include_role:

@@ -65,11 +65,11 @@ ssh-add "/Users/phil/Google Drive/Keys/GCE SSH Key/id_rsa"
 Install CloudBees CD Express Server, Analytics and obtain valid certs:
 
 ```bash
-ansible-playbook install_express_server.yaml -i inventory.txt
+ansible-playbook install_express_server.yaml --extra-vars 'files_yaml=../ansible-cloudbees-cd-trad-priv/cbcd-preview/vars.yaml' -i inventory.txt
 ```
 
 If you just want to obtain valid certs from an existing system:
 
 ```bash
-ansible-playbook letsencrypt_certs.yaml -i inventory.txt
+ansible-playbook certsonly.yaml -i inventory.txt --extra-vars 'files_yaml=../ansible-cloudbees-cd-trad-priv/cbcd-preview/vars.yaml' -i inventory.txt
 ```

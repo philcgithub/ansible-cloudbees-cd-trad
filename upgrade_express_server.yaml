@@ -1,5 +1,7 @@
 - name: Upgrade CloudBees CD Express Server
   hosts: cdserver
+  vars_files:
+    - "{{ files_yaml }}"
   tasks:
 # Setup env (mostly to make sure user can run the new installers as sudo)
   - name: Setup env

@@ -1,5 +1,7 @@
 - name: Handle certs
   hosts: cdserver
+  vars_files:
+    - "{{ files_yaml }}"
   tasks:
   - name: Run certs playbook only
     include_role:

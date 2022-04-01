@@ -2,3 +2,5 @@
   hosts: cdserver
   roles:
   - cdserver
+  vars_files:
+    - "{{ files_yaml }}"
