@@ -38,6 +38,7 @@
 #   become: yes
 
 # The next 5 commands are for Ubuntu 20.04+
+# Following these instructions: https://certbot.eff.org/instructions?ws=other&os=pip
 # Install certbot pre-reqs
 - name: Install certbot pre-reqa
   apt: name=python3,python3-venv,libaugeas0 state=present update_cache=yes
